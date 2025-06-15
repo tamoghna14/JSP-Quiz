@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JSP Quiz</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .question-container { background: white; padding: 20px; margin-bottom: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .question { font-weight: bold; margin-bottom: 10px; }
+    .options { list-style: none; padding: 0; }
+    .options li { margin: 8px 0; padding: 6px 10px; border-radius: 5px; }
+    .correct { background-color: #c8e6c9; }
+    .wrong { background-color: #ffcdd2; }
+    .clicked { pointer-events: none; }
+  </style>
+</head>
+<body>
+  <h1>JSP Quiz</h1>
+  <div id="quiz"></div>
+  <script>
+    const questions = [
+      { q: "What does JSP stand for?", options: ["Java Servlet Pages", "Java Server Pages", "JavaScript Pages", "Java Serverlets Pages"], answer: 1 },
+      { q: "Which file extension is used for JSP files?", options: [".java", ".jsp", ".html", ".js"], answer: 1 },
+      { q: "What is the purpose of JSP?", options: ["To provide a client-side scripting language", "To generate dynamic web pages", "To define the structure of a web page", "To handle HTTP requests"], answer: 1 },
+      { q: "How do you include Java code in a JSP file?", options: ["<%! %>", "<%= %>", "<% %>", "<%-- --%>"], answer: 2 },
+      { q: "Which JSP directive is used to import Java packages?", options: ["page", "include", "taglib", "import"], answer: 3 },
+      { q: "What is the purpose of the <%! %> directive in JSP?", options: ["To declare variables and methods accessible to all methods in the JSP file", "To include external files in the JSP file", "To define custom tag libraries", "To output dynamic content to the response"], answer: 0 },
+      { q: "Which implicit object represents the JSP page itself?", options: ["request", "response", "pageContext", "out"], answer: 2 },
+      { q: "What is the correct syntax to include another JSP file within a JSP file?", options: ["<jsp:include page=\"file.jsp\" />", "<%@ include file=\"file.jsp\" %>", "<% include file=\"file.jsp\" %>", "<jsp:import page=\"file.jsp\" />"], answer: 1 },
+      { q: "Which of the following is a valid JSP comment?", options: ["<!-- comment -->", "<%-- comment --%>", "// comment", "# comment #"], answer: 1 },
+      { q: "How can you access a request parameter in a JSP file?", options: ["request.getParameter(\"paramName\")", "pageContext.getParameter(\"paramName\")", "response.getParameter(\"paramName\")", "out.getParameter(\"paramName\")"], answer: 0 },
+      { q: "What is the purpose of the out implicit object in JSP?", options: ["To represent the current JSP page", "To write output to the response stream", "To store request attributes", "To manage session data"], answer: 1 },
+      { q: "Which JSP directive is used to specify page-specific configuration settings?", options: ["page", "include", "taglib", "import"], answer: 0 },
+      { q: "What is the correct syntax to define a custom JSP tag?", options: ["<mytag:tag>", "<jsp:tag>", "<%@ taglib prefix=\"mytag\" uri=\"http://example.com/tags\" %>", "<%@ include file=\"mytag\" %>"], answer: 2 },
+      { q: "Which JSP directive is used to include content from an external file?", options: ["page", "include", "taglib", "import"], answer: 1 },
+      { q: "What is the correct syntax to set a variable in JSP?", options: ["<% set var=\"value\" %>", "<% var = \"value\"; %>", "<% String var = \"value\"; %>", "<% var name=\"value\"; %>"], answer: 2 },
+      { q: "Which of the following is NOT a valid JSP action?", options: ["<jsp:forward>", "<jsp:useBean>", "<jsp:while>", "<jsp:include>"], answer: 2 },
+      { q: "What is the purpose of the <jsp:useBean> action in JSP?", options: ["To include a JavaBean in the JSP page", "To declare and initialize a JavaBean", "To define a custom tag", "None of the above"], answer: 0 },
+      { q: "Which JSP action is used to forward the request to another resource?", options: ["<jsp:forward>", "<jsp:include>", "<jsp:useBean>", "<jsp:parameter>"], answer: 0 },
+      { q: "What is the purpose of JSP expression language (EL)?", options: ["To include Java code in a JSP page", "To define custom tags", "To evaluate expressions within a JSP page", "None of the above"], answer: 2 },
+      { q: "Which operator is used for null-coalescing in JSP expression language?", options: ["&&", "||", "?:", "!!"], answer: 2 },
+      { q: "How do you access a session attribute in JSP expression language?", options: ["${session.getAttribute(\"attrName\")}", "${request.getSession().getAttribute(\"attrName\")}", "${pageContext.getAttribute(\"attrName\")}", "${attrName}"], answer: 0 },
+      { q: "What is the syntax for accessing a bean property in JSP expression language?", options: ["${bean.property}", "${bean.getProperty()}", "${bean['property']}", "All of the above"], answer: 0 },
+      { q: "Which JSP action is used to iterate over a collection?", options: ["<jsp:for>", "<jsp:while>", "<c:forEach>", "<c:forTokens>"], answer: 2 },
+      { q: "What is the purpose of the JSTL (JSP Standard Tag Library)?", options: ["To define custom tags", "To handle exceptions in JSP", "To provide a set of custom tags for common tasks", "None of the above"], answer: 2 },
+      { q: "Which of the following is NOT a standard JSTL tag library?", options: ["core", "sql", "xml", "html"], answer: 3 },
+      { q: "What is the correct syntax to import the JSTL core tag library?", options: ["<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/core\" %>", "<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/sql\" %>", "<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/xml\" %>", "<%@ taglib prefix=\"c\" uri=\"http://java.sun.com/jsp/jstl/html\" %>"], answer: 0 },
+      { q: "Which JSP action is used to define a custom tag?", options: ["<jsp:define>", "<jsp:taglib>", "<jsp:useBean>", "<jsp:include>"], answer: 1 },
+{ q: "Which of the following is NOT a JSTL core tag?", options: ["<c:forEach>", "<c:if>", "<c:choose>", "<c:select>"], answer: 3 },
+{ q: "What is the purpose of the <c:set> tag in JSTL?", options: ["To set a variable in the page, request, session, or application scope", "To define a custom tag", "To include content from another resource", "None of the above"], answer: 0 },
+{ q: "What is the purpose of the <c:if> tag in JSTL?", options: ["To iterate over a collection", "To conditionally include content", "To set a variable", "None of the above"], answer: 1 },
+{ q: "Which JSTL tag is used to import content from an external resource?", options: ["<c:import>", "<c:include>", "<c:set>", "<c:out>"], answer: 0 },
+{ q: "What is the purpose of the <c:remove> tag in JSTL?", options: ["To remove a variable from the page, request, session, or application scope", "To define a custom tag", "To include content from another resource", "None of the above"], answer: 0 },
+{ q: "Which JSP action is used to import content from another resource?", options: ["<jsp:include>", "<jsp:forward>", "<jsp:useBean>", "<jsp:parameter>"], answer: 0 },
+{ q: "What is the purpose of the <jsp:plugin> action in JSP?", options: ["To include a Java applet in the JSP page", "To define a custom tag", "To set a parameter for a JavaBean", "None of the above"], answer: 0 },
+{ q: "Which JSP action is used to set a parameter for a JavaBean?", options: ["<jsp:param>", "<jsp:plugin>", "<jsp:setProperty>", "<jsp:include>"], answer: 2 },
+{ q: "What is the purpose of the <jsp:useBean> action in JSP?", options: ["To declare and initialize a JavaBean", "To define a custom tag", "To include content from another resource", "None of the above"], answer: 0 },
+{ q: "Which JSP action is used to set a parameter for a custom tag?", options: ["<jsp:param>", "<jsp:include>", "<jsp:plugin>", "<jsp:setProperty>"], answer: 0 },
+{ q: "What is the purpose of the <jsp:directive.page> directive in JSP?", options: ["To import content from another resource", "To define page-specific configuration settings", "To include content from another resource", "None of the above"], answer: 1 },
+{ q: "Which JSP directive is used to specify the MIME type of the response?", options: ["<jsp:directive.page>", "<jsp:directive.include>", "<jsp:directive.tag>", "<jsp:directive.import>"], answer: 0 },
+{ q: "What is the purpose of the <jsp:directive.include> directive in JSP?", options: ["To include content from another resource", "To define page-specific configuration settings", "To specify the MIME type of the response", "None of the above"], answer: 0 },
+{ q: "Which of the following is NOT a valid JSP directive?", options: ["<jsp:directive.page>", "<jsp:directive.include>", "<jsp:directive.tag>", "<jsp:directive.element>"], answer: 3 },
+{ q: "What is the purpose of the <jsp:directive.tag> directive in JSP?", options: ["To define page-specific configuration settings", "To include content from another resource", "To specify the MIME type of the response", "To define a custom tag"], answer: 3 },
+{ q: "Which JSP directive is used to specify the version of the JSP specification used by the page?", options: ["<jsp:directive.page>", "<jsp:directive.include>", "<jsp:directive.tag>", "<jsp:directive.version>"], answer: 3 },
+{ q: "What is the purpose of the <jsp:directive.taglib> directive in JSP?", options: ["To define page-specific configuration settings", "To specify the version of the JSP specification used by the page", "To import content from another resource", "To declare a custom tag library"], answer: 3 },
+{ q: "Which JSP directive is used to specify the encoding of the JSP page?", options: ["<jsp:directive.encoding>", "<jsp:directive.page>", "<jsp:directive.include>", "<jsp:directive.tag>"], answer: 0 },
+{ q: "What is the purpose of the '<jsp:directive.decl>' directive in JSP?", options: ["To declare variables and methods accessible to all methods in the JSP file", "To include content from another resource", "To define a custom tag", "To specify the encoding of the JSP page"], answer: 0 },
+{ q: "Which JSP directive is used to declare variables and methods accessible to all methods in the JSP file?", options: ["<jsp:directive.decl>", "<jsp:directive.page>", "<jsp:directive.include>", "<jsp:directive.tag>"], answer: 0 },
+{ q: "What is the purpose of the <jsp:directive.doctype> directive in JSP?", options: ["To specify the version of the JSP specification used by the page", "To declare variables and methods accessible to all methods in the JSP file", "To specify the document type of the JSP page", "To define page-specific configuration settings"], answer: 2 },
+{ q: "Which JSP directive is used to specify the document type of the JSP page?", options: ["<jsp:directive.doctype>", "<jsp:directive.page>", "<jsp:directive.include>", "<jsp:directive.tag>"], answer: 0 },
+{ q: "What is the purpose of the <jsp:directive.tag> directive in JSP?", options: ["To declare variables and methods accessible to all methods in the JSP file", "To define a custom tag", "To specify the encoding of the JSP page", "To include content from another resource"], answer: 1 }
+    ];
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function renderQuiz() {
+      shuffle(questions);
+      const quiz = document.getElementById("quiz");
+      questions.forEach((item, index) => {
+        const container = document.createElement("div");
+        container.className = "question-container";
+        container.innerHTML = `<div class="question">${index + 1}. ${item.q}</div>`;
+        const list = document.createElement("ul");
+        list.className = "options";
+
+        item.options.forEach((opt, i) => {
+          const li = document.createElement("li");
+          li.textContent = opt;
+          li.style.cursor = "pointer";
+          li.addEventListener("click", () => {
+            if (li.classList.contains("clicked")) return;
+            if (i === item.answer) {
+              li.classList.add("correct");
+            } else {
+              li.classList.add("wrong");
+              list.children[item.answer].classList.add("correct");
+            }
+            Array.from(list.children).forEach(child => child.classList.add("clicked"));
+          });
+          list.appendChild(li);
+        });
+
+        container.appendChild(list);
+        quiz.appendChild(container);
+      });
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
